@@ -2,7 +2,6 @@ defmodule Shortener.Worker.Supervisor do
   @moduledoc false
 
   use Supervisor
-  alias Shortener.TCP.Server
 
   @name __MODULE__
 

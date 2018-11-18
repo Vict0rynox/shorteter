@@ -5,19 +5,25 @@ defmodule Shortener.TCP.Connection do
 
   @moduledoc false
 
+  # Start get server
   def start_link(conn) do
     GenServer.start_link(__MODULE__, conn)
   end
 
+  # Spawn loop. without using handle(cast/call) function.
   def start_handler(conn) do
     spawn_link(__MODULE__, :loop, [conn, worker_name(conn)])
   end
 
+  # init genServer callback
   def init(conn) do
     Process.flag(:trap_exit, true)
     start_handler(conn)
     {:ok, conn}
   end
+
+
+  # handler info callback
 
   def handle_info({:EXIT, _pid, :normal}, _conn) do
     exit(:normal)
@@ -29,6 +35,8 @@ defmodule Shortener.TCP.Connection do
     start_handler(conn)
     {:noreply, conn}
   end
+
+  # loop function
 
   def loop(conn, worker_name) do
     case :gen_tcp.recv(conn, 0) do
@@ -57,7 +65,6 @@ defmodule Shortener.TCP.Connection do
       pid -> pid
     end
   end
-
 
   def worker_name(conn) do
     {:ok, {{a, b, c, d}, _}} = :inet.peername(conn)
